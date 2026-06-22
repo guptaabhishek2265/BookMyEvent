@@ -7,6 +7,7 @@ A production-ready MERN stack event booking application built as part of a **Ful
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
+- [Application Flow](#application-flow)
 - [Folder Structure](#folder-structure)
 - [Architecture](#architecture)
 - [Database Design](#database-design)
@@ -85,9 +86,10 @@ The application includes:
 
 - Send booking OTP
 - Book an event after OTP verification
+- Select the number of seats before booking
 - View current user's bookings
 - Cancel booking
-- Restore one seat automatically when a confirmed booking is cancelled
+- Restore booked seats automatically when a confirmed booking is cancelled
 - Prevent duplicate active bookings for the same event
 - Prevent confirming bookings when no seats are available
 
@@ -98,6 +100,49 @@ The application includes:
 - Return proper HTTP status codes
 - Return meaningful error messages
 - Restrict admin APIs with role-based authorization
+
+## Application Flow
+
+The application is designed around a complete event booking journey:
+
+1. **User opens the Event Dashboard**
+   - The user starts on the Discover / Event Dashboard.
+   - Events are shown with category filters, search, ticket price, seat availability, and event cards.
+   - The user selects an event to inspect details before booking.
+
+2. **User views event details and starts booking**
+   - The Event Detail page shows event description, venue, date, ticket price, total seats, and available seats.
+   - The user chooses the number of seats to book.
+   - The system validates that the selected seat count is available.
+   - The user requests an OTP before submitting the booking.
+
+3. **User verifies OTP and creates a booking request**
+   - The backend sends an OTP to the logged-in user's email.
+   - The user enters the OTP on the event page.
+   - After successful OTP verification, a booking is created with `pending` status.
+   - For paid events, the user is redirected to the payment page.
+
+4. **User completes payment**
+   - The Payment Dashboard displays the selected event, number of seats, and total amount.
+   - The user enters payment details and submits payment.
+   - Payment status is recorded as paid.
+   - The booking still waits for admin approval after payment.
+
+5. **Admin reviews the booking request**
+   - The Admin Dashboard shows pending booking requests, paid clients, revenue, confirmed bookings, and event inventory.
+   - The admin can approve the booking as paid or reject the request.
+   - When the admin approves the booking, the booking status becomes `confirmed`.
+   - The confirmed booking deducts the booked seat count from the event inventory.
+
+6. **User tracks bookings from the User Dashboard**
+   - The User Dashboard shows total requests, confirmed bookings, pending requests, paid spend, and cancelled bookings.
+   - The user can view each booking's event, status, payment state, seat count, and amount.
+   - Confirmed and pending bookings can be cancelled by the user.
+
+7. **User cancels a booking**
+   - If a user cancels a pending booking, the booking is marked as `cancelled`.
+   - If a user cancels a confirmed booking, the booking is marked as `cancelled` and the booked seats are released back to the event inventory.
+   - The event's available seat count is capped at the total seat count to avoid over-restoration.
 
 ## Folder Structure
 
@@ -193,6 +238,7 @@ flowchart LR
 {
   userId: ObjectId,
   eventId: ObjectId,
+  seatsBooked: Number,
   status: "pending" | "confirmed" | "cancelled",
   paymentStatus: "paid" | "not_paid",
   amount: Number,
@@ -200,7 +246,7 @@ flowchart LR
 }
 ```
 
-> Current implementation creates one booking per user per event. Seat deduction happens when an admin confirms the booking.
+> Current implementation creates one active booking per user per event. Seat deduction happens when an admin confirms the booking, and the full booked seat count is restored if a confirmed booking is cancelled.
 
 ## API Documentation
 
