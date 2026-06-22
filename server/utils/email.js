@@ -16,7 +16,8 @@ const emailUser = cleanEnv(process.env.EMAIL_USER);
 const emailPassword = cleanEnv(process.env.EMAIL_PASS).replace(/\s/g, '');
 const smtpHost = getEnv('SMTP_HOST', 'EMAIL_HOST') || 'smtp.gmail.com';
 const smtpPort = Number(getEnv('SMTP_PORT', 'EMAIL_PORT') || 587);
-const smtpSecure = (getEnv('SMTP_SECURE', 'EMAIL_SECURE') || 'false') === 'true';
+const smtpSecureEnv = getEnv('SMTP_SECURE', 'EMAIL_SECURE');
+const smtpSecure = smtpSecureEnv ? smtpSecureEnv === 'true' : smtpPort === 465;
 
 const primaryOptions = {
     host: smtpHost,
