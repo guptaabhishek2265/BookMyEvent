@@ -104,35 +104,35 @@ The application includes:
 ```text
 event-booking-system/
 |
-├── client/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── index.html
-│   ├── package.json
-│   ├── tailwind.config.js
-│   └── vite.config.js
+|-- client/
+|   |-- src/
+|   |   |-- components/
+|   |   |-- context/
+|   |   |-- pages/
+|   |   |-- utils/
+|   |   |-- App.jsx
+|   |   |-- main.jsx
+|   |   `-- index.css
+|   |-- index.html
+|   |-- package.json
+|   |-- tailwind.config.js
+|   `-- vite.config.js
 |
-├── server/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── scripts/
-│   ├── utils/
-│   ├── package.json
-│   ├── seed.js
-│   └── server.js
+|-- server/
+|   |-- controllers/
+|   |-- middleware/
+|   |-- models/
+|   |-- routes/
+|   |-- scripts/
+|   |-- utils/
+|   |-- package.json
+|   |-- seed.js
+|   `-- server.js
 |
-├── README.md
-├── SETUP_GUIDE.md
-├── package.json
-└── Eventora_Postman_Collection.json
+|-- README.md
+|-- SETUP_GUIDE.md
+|-- package.json
+`-- Eventora_Postman_Collection.json
 ```
 
 ## Architecture
@@ -566,10 +566,12 @@ Success Response:
 
 ### Backend `.env`
 
+Create this file locally as `server/.env`. Do not commit real values or completed connection strings.
+
 ```env
 PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secure_jwt_secret
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=generate_a_secure_random_jwt_secret
 CLIENT_URL=http://localhost:5173
 GOOGLE_CLIENT_ID=your_google_oauth_client_id
 EMAIL_USER=your_email_address
@@ -579,8 +581,8 @@ EMAIL_PASS=your_email_app_password
 | Variable | Description |
 | --- | --- |
 | `PORT` | Backend server port. Defaults to `5000`. |
-| `MONGO_URI` | MongoDB connection string. |
-| `JWT_SECRET` | Secret key used to sign JWT tokens. |
+| `MONGO_URI` | MongoDB connection string. Keep the completed URI private. |
+| `JWT_SECRET` | Long random secret used to sign JWT tokens. Keep it private. |
 | `CLIENT_URL` | Frontend origin allowed by CORS. Use the deployed frontend URL in production. |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID used to verify Google sign-in tokens. |
 | `EMAIL_USER` | Email account used for OTP and booking notifications. |
@@ -593,6 +595,8 @@ CLIENT_URLS=https://frontend-one.com,https://frontend-two.com
 ```
 
 ### Frontend `.env`
+
+Create this file locally as `client/.env`. Only variables prefixed with `VITE_` are exposed to the browser.
 
 ```env
 VITE_API_URL=http://localhost:5000/api
@@ -676,6 +680,7 @@ npm run dev
 - Admin-only APIs are protected with role-based middleware.
 - CORS restricts allowed frontend origins.
 - Secrets are stored in environment variables.
+- Real `.env` files are ignored by Git; commit only `.env.example` placeholders.
 - Google sign-in ID tokens are verified on the backend.
 - OTP verification adds an extra layer for account verification and booking confirmation.
 - Meaningful errors are returned without exposing sensitive server internals.
@@ -718,7 +723,7 @@ npm start
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_atlas_connection_string
-JWT_SECRET=your_secure_jwt_secret
+JWT_SECRET=generate_a_secure_random_jwt_secret
 CLIENT_URL=https://your-frontend-domain.com
 GOOGLE_CLIENT_ID=your_google_oauth_client_id
 EMAIL_USER=your_email_address
@@ -730,7 +735,8 @@ EMAIL_PASS=your_email_app_password
 1. Create a MongoDB Atlas cluster.
 2. Create a database user.
 3. Add your deployment IP or allow access from required hosts.
-4. Copy the connection string into `MONGO_URI`.
+4. Copy the connection string into `MONGO_URI` in your local `server/.env` or hosting provider dashboard only.
+5. If a MongoDB URI is ever committed, rotate the database user's password immediately.
 
 ### Google Cloud OAuth Setup
 
@@ -743,19 +749,15 @@ https://your-frontend-domain.com
 
 No trailing slash is required.
 
-## Screenshots
+## Project Diagrams
 
-### Login Page
+### Booking Data Flow
 
-![Login](./screenshots/login.png)
+![Booking data flow](./dfd.png)
 
-### Events Page
+### Booking Flowchart
 
-![Events](./screenshots/events.png)
-
-### Booking Page
-
-![Booking](./screenshots/booking.png)
+![Booking flowchart](./fc.png)
 
 ## Future Enhancements
 
@@ -769,6 +771,3 @@ No trailing slash is required.
 - Real-time seat updates using Socket.io
 - MongoDB transactions for stricter high-concurrency seat updates
 - Automated test suite for API and frontend flows
-
-#   U p d a t e  
- 
