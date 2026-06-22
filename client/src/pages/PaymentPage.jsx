@@ -4,6 +4,7 @@ import api from '../utils/axios';
 import { AuthContext } from '../context/AuthContext';
 import {
     FaArrowLeft,
+    FaChair,
     FaCheckCircle,
     FaCreditCard,
     FaLock,
@@ -154,6 +155,10 @@ const PaymentPage = () => {
                                 <span className="font-black text-slate-900 dark:text-white">{booking?.eventId?.title}</span>
                             </div>
                             <div className="mt-2 flex justify-between text-sm">
+                                <span className="font-bold text-slate-500 dark:text-slate-400">Seats</span>
+                                <span className="font-black text-slate-900 dark:text-white">{booking?.seatsBooked || 1}</span>
+                            </div>
+                            <div className="mt-2 flex justify-between text-sm">
                                 <span className="font-bold text-slate-500 dark:text-slate-400">Amount paid</span>
                                 <span className="font-black text-emerald-600 dark:text-emerald-300">{fmtMoney(booking?.amount)}</span>
                             </div>
@@ -205,7 +210,9 @@ const PaymentPage = () => {
 
                     {/* amount banner */}
                     <div className="mt-4 flex items-center justify-between rounded-2xl bg-white/10 px-4 py-3">
-                        <span className="text-sm font-bold text-slate-300">Amount due</span>
+                        <span className="inline-flex items-center gap-2 text-sm font-bold text-slate-300">
+                            <FaChair /> {booking?.seatsBooked || 1} seat{(booking?.seatsBooked || 1) === 1 ? '' : 's'}
+                        </span>
                         <span className="text-2xl font-black text-white">{fmtMoney(booking?.amount)}</span>
                     </div>
                 </div>

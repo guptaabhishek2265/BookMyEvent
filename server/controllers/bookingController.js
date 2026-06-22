@@ -2,6 +2,8 @@ const Booking = require('../models/Booking');
 const Event = require('../models/Event');
 const OTP = require('../models/OTP');
 const { sendBookingEmail, sendOTPEmail } = require('../utils/email');
+const { deductSeats, hasEnoughSeats, restoreSeats } = require('../utils/seatInventory');
+const { parseSeatQuantity } = require('../utils/validation');
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -20,6 +22,11 @@ exports.sendBookingOTP = async (req, res) => {
 exports.bookEvent = async (req, res) => {
     try {
         const { eventId, otp } = req.body;
+        const seatsBooked = parseSeatQuantity(req.body.seatsBooked ?? req.body.numberOfSeats ?? req.body.seats ?? req.body.quantity);
+
+        if (!eventId) return res.status(400).json({ message: 'Event is required' });
+        if (!otp) return res.status(400).json({ message: 'OTP is required' });
+        if (!seatsBooked) return res.status(400).json({ message: 'Seats must be a positive whole number' });
 
         // Verify OTP explicitly before proceeding
         const validOTP = await OTP.findOne({ email: req.user.email, otp, action: 'event_booking' });
@@ -30,6 +37,9 @@ exports.bookEvent = async (req, res) => {
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event not found' });
         if (event.availableSeats <= 0) return res.status(400).json({ message: 'No seats available' });
+        if (!hasEnoughSeats(event.availableSeats, seatsBooked)) {
+            return res.status(400).json({ message: `Only ${event.availableSeats} seats are available` });
+        }
 
         const existingBooking = await Booking.findOne({ userId: req.user.id, eventId });
         if (existingBooking && existingBooking.status !== 'cancelled') {
@@ -39,9 +49,10 @@ exports.bookEvent = async (req, res) => {
         const booking = await Booking.create({
             userId: req.user.id,
             eventId,
+            seatsBooked,
             status: 'pending',
             paymentStatus: 'not_paid',
-            amount: event.ticketPrice
+            amount: Number(event.ticketPrice || 0) * seatsBooked
         });
 
         await OTP.deleteOne({ _id: validOTP._id }); // cleanup
@@ -59,10 +70,13 @@ exports.confirmBooking = async (req, res) => {
         if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
         if (booking.status === 'confirmed') return res.status(400).json({ message: 'Booking is already confirmed' });
+        if (booking.status === 'cancelled') return res.status(400).json({ message: 'Cannot confirm a cancelled booking' });
 
         const event = await Event.findById(booking.eventId._id);
-        if (event.availableSeats <= 0) {
-            return res.status(400).json({ message: 'No seats available to confirm this booking' });
+        const seatsBooked = booking.seatsBooked || 1;
+        const nextAvailableSeats = deductSeats(event.availableSeats, seatsBooked);
+        if (nextAvailableSeats === null) {
+            return res.status(400).json({ message: `Only ${event.availableSeats} seats are available to confirm this booking` });
         }
 
         booking.status = 'confirmed';
@@ -71,7 +85,7 @@ exports.confirmBooking = async (req, res) => {
         }
         await booking.save();
 
-        event.availableSeats -= 1;
+        event.availableSeats = nextAvailableSeats;
         await event.save();
 
         // Send email on admin confirmation
@@ -133,11 +147,11 @@ exports.cancelBooking = async (req, res) => {
         booking.status = 'cancelled';
         await booking.save();
 
-        // Only restore the seat if it was actually confirmed and deducted
+        // Only restore seats if they were actually confirmed and deducted
         if (wasConfirmed) {
             const event = await Event.findById(booking.eventId);
             if (event) {
-                event.availableSeats += 1;
+                event.availableSeats = restoreSeats(event.availableSeats, event.totalSeats, booking.seatsBooked || 1);
                 await event.save();
             }
         }

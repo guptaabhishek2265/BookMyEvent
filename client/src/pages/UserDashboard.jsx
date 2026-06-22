@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
     FaArrowRight,
     FaCalendarAlt,
+    FaChair,
     FaChartPie,
     FaCheckCircle,
     FaChevronRight,
@@ -379,6 +380,7 @@ const UserDashboard = () => {
                                                 <th className="px-5 py-4">Date</th>
                                                 <th className="px-5 py-4">Status</th>
                                                 <th className="px-5 py-4">Payment</th>
+                                                <th className="px-5 py-4">Seats</th>
                                                 <th className="px-5 py-4">Amount</th>
                                                 <th className="px-5 py-4 text-right">Actions</th>
                                             </tr>
@@ -478,6 +480,11 @@ const BookingRow = ({ booking, cancelBooking }) => {
                     <span className="text-xs font-bold text-slate-400">Not applicable</span>
                 )}
             </td>
+            <td className="px-5 py-4">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">
+                    <FaChair /> {booking.seatsBooked || 1}
+                </span>
+            </td>
             <td className="px-5 py-4 font-black text-slate-950">{formatAmount(booking.amount)}</td>
             <td className="px-5 py-4 text-right">
                 <BookingActions booking={booking} cancelBooking={cancelBooking} compact />
@@ -512,6 +519,9 @@ const BookingCard = ({ booking, cancelBooking }) => {
                                 {booking.paymentStatus.replace('_', ' ')}
                             </span>
                         )}
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700 ring-1 ring-slate-200">
+                            {booking.seatsBooked || 1} seat{(booking.seatsBooked || 1) === 1 ? '' : 's'}
+                        </span>
                     </div>
                 </div>
             </div>

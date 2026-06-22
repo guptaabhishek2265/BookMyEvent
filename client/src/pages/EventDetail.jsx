@@ -41,6 +41,7 @@ const EventDetail = () => {
     const [successMsg, setSuccessMsg] = useState('');
     const [activeTab, setActiveTab] = useState('Overview');
     const [toast, setToast] = useState(null);
+    const [seatsBooked, setSeatsBooked] = useState(1);
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -67,6 +68,11 @@ const EventDetail = () => {
         return () => clearTimeout(timeoutId);
     }, [toast]);
 
+    useEffect(() => {
+        if (!event) return;
+        setSeatsBooked((current) => Math.max(1, Math.min(Number(current) || 1, Math.max(1, event.availableSeats))));
+    }, [event]);
+
     const handleBooking = async () => {
         if (!user) {
             setToast({
@@ -75,6 +81,24 @@ const EventDetail = () => {
                 message: 'Log in to request access to this event.'
             });
             navigate('/login');
+            return;
+        }
+
+        const selectedSeats = Number(seatsBooked);
+        if (!Number.isInteger(selectedSeats) || selectedSeats < 1) {
+            setToast({
+                type: 'error',
+                title: 'Invalid seats',
+                message: 'Select at least one seat.'
+            });
+            return;
+        }
+        if (selectedSeats > event.availableSeats) {
+            setToast({
+                type: 'error',
+                title: 'Not enough seats',
+                message: `Only ${event.availableSeats} seats are available.`
+            });
             return;
         }
 
@@ -94,7 +118,7 @@ const EventDetail = () => {
                     message: 'Check your inbox and enter the code to submit your request.'
                 });
             } else {
-                const { data } = await api.post('/bookings', { eventId: event._id, otp });
+                const { data } = await api.post('/bookings', { eventId: event._id, otp, seatsBooked: selectedSeats });
                 setShowOTP(false);
                 setOtp('');
 
@@ -102,8 +126,7 @@ const EventDetail = () => {
                 if (Number(event.ticketPrice) > 0) {
                     navigate(`/payment/${data.booking._id}`);
                 } else {
-                    setSuccessMsg('Booking request submitted. Awaiting admin approval.');
-                    setEvent({ ...event, availableSeats: Math.max(0, event.availableSeats - 1) });
+                    setSuccessMsg(`Booking request submitted for ${selectedSeats} seat${selectedSeats === 1 ? '' : 's'}. Awaiting admin approval.`);
                     setToast({
                         type: 'success',
                         title: 'Booking request submitted',
@@ -162,6 +185,7 @@ const EventDetail = () => {
     }
 
     const isSoldOut = event.availableSeats <= 0;
+    const totalPrice = Number(event.ticketPrice || 0) * Number(seatsBooked || 1);
 
     return (
         <div className="mx-auto max-w-7xl">
@@ -275,6 +299,45 @@ const EventDetail = () => {
                                 </div>
                             </div>
 
+                            <div className="mt-5">
+                                <label className="mb-2 block text-sm font-black text-slate-700 dark:text-slate-200">Seats to book</label>
+                                <div className="grid grid-cols-[44px_1fr_44px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSeatsBooked((value) => Math.max(1, Number(value) - 1))}
+                                        disabled={showOTP || bookingLoading || seatsBooked <= 1}
+                                        className="text-lg font-black text-slate-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-200 dark:hover:bg-white/10"
+                                    >
+                                        -
+                                    </button>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max={event.availableSeats}
+                                        disabled={showOTP || bookingLoading}
+                                        value={seatsBooked}
+                                        onChange={(inputEvent) => {
+                                            const value = Number(inputEvent.target.value);
+                                            if (!inputEvent.target.value) return setSeatsBooked('');
+                                            setSeatsBooked(Math.max(1, Math.min(value, event.availableSeats)));
+                                        }}
+                                        className="border-x border-slate-200 bg-transparent px-3 py-3 text-center text-lg font-black text-slate-950 outline-none dark:border-white/10 dark:text-white"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setSeatsBooked((value) => Math.min(event.availableSeats, Number(value) + 1))}
+                                        disabled={showOTP || bookingLoading || seatsBooked >= event.availableSeats}
+                                        className="text-lg font-black text-slate-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-200 dark:hover:bg-white/10"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                                <div className="mt-3 flex items-center justify-between rounded-2xl bg-sky-50 px-4 py-3 text-sm font-bold text-slate-700 dark:bg-sky-500/10 dark:text-slate-200">
+                                    <span>Total</span>
+                                    <span className="text-sky-700 dark:text-sky-200">{formatPrice(totalPrice)}</span>
+                                </div>
+                            </div>
+
                             {showOTP && (
                                 <div className="mt-5">
                                     <label className="mb-2 block text-sm font-black text-slate-700 dark:text-slate-200">Enter secure OTP</label>
@@ -293,7 +356,7 @@ const EventDetail = () => {
                             <button
                                 type="button"
                                 onClick={handleBooking}
-                                disabled={isSoldOut || bookingLoading || (showOTP && !otp) || (successMsg && !showOTP)}
+                                disabled={isSoldOut || bookingLoading || !seatsBooked || seatsBooked > event.availableSeats || (showOTP && !otp) || (successMsg && !showOTP)}
                                 className={`mt-5 w-full rounded-2xl px-5 py-4 text-sm font-black transition ${isSoldOut || (successMsg && !showOTP)
                                     ? 'cursor-not-allowed bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-500'
                                     : 'bg-slate-950 text-white shadow-lg shadow-slate-300 hover:-translate-y-0.5 hover:bg-sky-600 dark:bg-sky-500 dark:shadow-black/20 dark:hover:bg-sky-400'

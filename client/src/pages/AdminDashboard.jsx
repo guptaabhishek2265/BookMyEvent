@@ -499,6 +499,7 @@ const BookingRow = ({ booking, activeAction, onApprove, onReject }) => {
             <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-3 text-xs dark:bg-white/5 sm:grid-cols-4">
                 <InfoBlock icon={FaUserCircle} label="User" value={booking.userId?.name || 'Unknown'} />
                 <InfoBlock icon={null} label="Email" value={booking.userId?.email || '—'} />
+                <InfoBlock icon={FaChair} label="Booked seats" value={booking.seatsBooked || 1} />
                 <InfoBlock icon={FaMoneyBillWave} label="Amount" value={fmtMoney(booking.amount)} />
                 <InfoBlock icon={FaClock} label="Requested" value={fmt(booking.createdAt)} />
                 {booking.eventId && (

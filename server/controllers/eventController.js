@@ -1,4 +1,5 @@
 const Event = require('../models/Event');
+const { validateEventPayload } = require('../utils/validation');
 
 exports.getEvents = async (req, res) => {
     try {
@@ -26,6 +27,9 @@ exports.getEventById = async (req, res) => {
 exports.createEvent = async (req, res) => {
     try {
         const { title, description, date, location, category, totalSeats, ticketPrice, image } = req.body;
+        const validationError = validateEventPayload({ title, description, date, location, category, totalSeats, ticketPrice });
+        if (validationError) return res.status(400).json({ message: validationError });
+
         const event = await Event.create({
             title,
             description,
@@ -46,6 +50,22 @@ exports.createEvent = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
     try {
+        const existingEvent = await Event.findById(req.params.id);
+        if (!existingEvent) return res.status(404).json({ message: 'Event not found' });
+
+        const nextEvent = { ...existingEvent.toObject(), ...req.body };
+        const validationError = validateEventPayload(nextEvent);
+        if (validationError) return res.status(400).json({ message: validationError });
+
+        if (req.body.totalSeats !== undefined) {
+            const nextTotalSeats = Number(req.body.totalSeats);
+            const bookedSeats = Number(existingEvent.totalSeats) - Number(existingEvent.availableSeats);
+            if (nextTotalSeats < bookedSeats) {
+                return res.status(400).json({ message: `Total seats cannot be less than ${bookedSeats} already booked seats` });
+            }
+            req.body.availableSeats = nextTotalSeats - bookedSeats;
+        }
+
         const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!event) return res.status(404).json({ message: 'Event not found' });
         res.json(event);

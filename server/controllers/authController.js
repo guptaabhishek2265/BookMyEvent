@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const { sendOTPEmail } = require('../utils/email');
+const { validateLogin, validateRegistration } = require('../utils/validation');
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClient = new OAuth2Client(googleClientId);
@@ -26,6 +27,9 @@ const userResponse = (user) => ({
 exports.register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
+        const validationError = validateRegistration({ name, email, password });
+        if (validationError) return res.status(400).json({ message: validationError });
+
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: 'User already exists' });
 
@@ -56,6 +60,9 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        const validationError = validateLogin({ email, password });
+        if (validationError) return res.status(400).json({ message: validationError });
+
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
