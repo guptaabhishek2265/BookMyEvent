@@ -3,13 +3,25 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const emailPassword = (process.env.EMAIL_PASS || '').replace(/\s/g, '');
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        pass: emailPassword
     }
 });
+
+const sendMail = async (mailOptions) => {
+    if (!process.env.EMAIL_USER || !emailPassword) {
+        throw new Error('Email service is not configured');
+    }
+    return transporter.sendMail(mailOptions);
+};
 
 const sendBookingEmail = async (userEmail, userName, eventTitle) => {
     try {
@@ -23,7 +35,7 @@ const sendBookingEmail = async (userEmail, userName, eventTitle) => {
         <p>Thank you for choosing Eventora.</p>
       `
         };
-        await transporter.sendMail(mailOptions);
+        await sendMail(mailOptions);
         console.log('Email sent successfully to', userEmail);
     } catch (error) {
         console.error('Error sending email:', error);
@@ -52,10 +64,11 @@ const sendOTPEmail = async (userEmail, otp, type) => {
                 </div>
             `
         };
-        await transporter.sendMail(mailOptions);
+        await sendMail(mailOptions);
         console.log(`OTP sent to ${userEmail} for ${type}`);
     } catch (error) {
         console.error('Error sending OTP email:', error);
+        throw error;
     }
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/axios';
 import { Link, useNavigate } from 'react-router-dom';
@@ -78,6 +78,11 @@ const UserDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [activeSection, setActiveSection] = useState('overview');
+    const overviewRef = useRef(null);
+    const bookingsRef = useRef(null);
+    const scheduleRef = useRef(null);
+    const securityRef = useRef(null);
 
     useEffect(() => {
         if (!user) {
@@ -146,6 +151,17 @@ const UserDashboard = () => {
         { key: 'cancelled', label: 'Cancelled', value: stats.cancelled, color: 'bg-rose-500' }
     ];
 
+    const scrollToSection = (section) => {
+        setActiveSection(section);
+        const refs = {
+            overview: overviewRef,
+            bookings: bookingsRef,
+            schedule: scheduleRef,
+            security: securityRef
+        };
+        refs[section]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     if (loading) {
         return (
             <div className="min-h-[70vh] rounded-[2rem] bg-slate-950 px-6 py-12 text-white shadow-2xl">
@@ -195,16 +211,19 @@ const UserDashboard = () => {
 
                     <nav className="mt-8 grid gap-2 text-sm font-semibold">
                         {[
-                            { label: 'Overview', icon: FaLayerGroup, active: true },
-                            { label: 'Bookings', icon: FaTicketAlt },
-                            { label: 'Schedule', icon: FaCalendarAlt },
-                            { label: 'Security', icon: FaShieldAlt }
+                            { key: 'overview', label: 'Overview', icon: FaLayerGroup },
+                            { key: 'bookings', label: 'Bookings', icon: FaTicketAlt },
+                            { key: 'schedule', label: 'Schedule', icon: FaCalendarAlt },
+                            { key: 'security', label: 'Security', icon: FaShieldAlt }
                         ].map((item) => {
                             const Icon = item.icon;
+                            const active = activeSection === item.key;
                             return (
                                 <button
                                     key={item.label}
-                                    className={`flex items-center justify-between rounded-2xl px-4 py-3 text-left transition ${item.active
+                                    type="button"
+                                    onClick={() => scrollToSection(item.key)}
+                                    className={`flex items-center justify-between rounded-2xl px-4 py-3 text-left transition ${active
                                         ? 'bg-white text-slate-950 shadow-lg shadow-sky-950/20'
                                         : 'text-slate-300 hover:bg-white/10 hover:text-white'
                                         }`}
@@ -213,7 +232,7 @@ const UserDashboard = () => {
                                         <Icon />
                                         {item.label}
                                     </span>
-                                    {item.active && <FaChevronRight className="text-xs text-slate-500" />}
+                                    {active && <FaChevronRight className="text-xs text-slate-500" />}
                                 </button>
                             );
                         })}
@@ -233,7 +252,7 @@ const UserDashboard = () => {
                 </aside>
 
                 <section className="min-w-0 bg-slate-100/95 p-4 sm:p-6 lg:p-8">
-                    <header className="flex flex-col gap-4 rounded-[1.75rem] border border-white bg-white/80 p-5 shadow-sm backdrop-blur md:flex-row md:items-center md:justify-between">
+                    <header ref={overviewRef} className="scroll-mt-6 flex flex-col gap-4 rounded-[1.75rem] border border-white bg-white/80 p-5 shadow-sm backdrop-blur md:flex-row md:items-center md:justify-between">
                         <div>
                             <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-slate-500">
                                 <span>Dashboard</span>
@@ -301,7 +320,7 @@ const UserDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="rounded-[1.75rem] border border-slate-900 bg-slate-950 p-5 text-white shadow-xl shadow-slate-300">
+                        <div ref={scheduleRef} className="scroll-mt-6 rounded-[1.75rem] border border-slate-900 bg-slate-950 p-5 text-white shadow-xl shadow-slate-300">
                             <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-200">Next Up</p>
                             {stats.upcoming?.eventId ? (
                                 <div className="mt-5">
@@ -336,7 +355,7 @@ const UserDashboard = () => {
                         </div>
                     </div>
 
-                    <div className="mt-6 rounded-[1.75rem] border border-white bg-white p-4 shadow-sm sm:p-5">
+                    <div ref={bookingsRef} className="mt-6 scroll-mt-6 rounded-[1.75rem] border border-white bg-white p-4 shadow-sm sm:p-5">
                         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                             <div>
                                 <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Bookings</p>
@@ -407,6 +426,26 @@ const UserDashboard = () => {
                                 )}
                             </>
                         )}
+                    </div>
+
+                    <div ref={securityRef} className="mt-6 scroll-mt-6 rounded-[1.75rem] border border-white bg-white p-5 shadow-sm">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Security</p>
+                                <h3 className="mt-1 text-xl font-black text-slate-950">Account protection</h3>
+                                <p className="mt-1 text-sm font-semibold text-slate-500">Your account uses JWT authentication and protected booking routes.</p>
+                            </div>
+                            <div className="grid gap-3 text-sm font-bold text-slate-600 sm:grid-cols-2">
+                                <div className="rounded-2xl bg-slate-50 px-4 py-3">
+                                    <p className="text-xs font-black uppercase tracking-wider text-slate-400">Email</p>
+                                    <p className="mt-1 truncate">{user?.email}</p>
+                                </div>
+                                <div className="rounded-2xl bg-slate-50 px-4 py-3">
+                                    <p className="text-xs font-black uppercase tracking-wider text-slate-400">Role</p>
+                                    <p className="mt-1 capitalize">{user?.role}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>

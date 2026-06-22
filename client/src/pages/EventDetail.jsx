@@ -135,7 +135,9 @@ const EventDetail = () => {
                 }
             }
         } catch (err) {
-            const message = err.response?.data?.message || 'Booking failed';
+            const message = err.code === 'ECONNABORTED'
+                ? 'The server took too long to respond. Please try again in a moment.'
+                : err.response?.data?.message || 'Booking failed';
             setError(message);
             setToast({
                 type: 'error',
