@@ -8,6 +8,7 @@ dotenv.config();
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const bookingRoutes = require('./routes/bookings');
+const { verifyEmailConfig } = require('./utils/email');
 
 const app = express();
 
@@ -37,6 +38,32 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
   res.json({ message: 'Eventora API is running' });
+});
+
+app.get('/api/health/email', async (req, res) => {
+  try {
+    const result = await verifyEmailConfig();
+    res.json({
+      ok: true,
+      message: 'Email configuration is valid',
+      host: result.host,
+      port: result.port,
+      user: result.user
+    });
+  } catch (error) {
+    console.error('Email health check failed:', {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      response: error.response
+    });
+    res.status(500).json({
+      ok: false,
+      message: 'Email configuration failed',
+      error: error.message,
+      code: error.code
+    });
+  }
 });
 
 // Routes

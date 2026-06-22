@@ -19,9 +19,15 @@ exports.sendBookingOTP = async (req, res) => {
         if (createdOTP?._id) {
             await OTP.deleteOne({ _id: createdOTP._id });
         }
+        console.error('Booking OTP email failed:', {
+            message: error.message,
+            code: error.code,
+            command: error.command,
+            response: error.response
+        });
         res.status(502).json({
             message: 'Could not send OTP email. Please check the email configuration and try again.',
-            error: error.message
+            error: process.env.NODE_ENV === 'production' ? undefined : error.message
         });
     }
 };

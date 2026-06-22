@@ -3,30 +3,49 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const emailPassword = (process.env.EMAIL_PASS || '').replace(/\s/g, '');
+const cleanEnv = (value) => (value || '').trim().replace(/^['"]|['"]$/g, '');
+const emailUser = cleanEnv(process.env.EMAIL_USER);
+const emailPassword = cleanEnv(process.env.EMAIL_PASS).replace(/\s/g, '');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: Number(process.env.EMAIL_PORT || 465),
+    secure: String(process.env.EMAIL_SECURE || 'true') === 'true',
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 15000,
     auth: {
-        user: process.env.EMAIL_USER,
+        user: emailUser,
         pass: emailPassword
     }
 });
 
 const sendMail = async (mailOptions) => {
-    if (!process.env.EMAIL_USER || !emailPassword) {
+    if (!emailUser || !emailPassword) {
         throw new Error('Email service is not configured');
     }
-    return transporter.sendMail(mailOptions);
+    return transporter.sendMail({
+        ...mailOptions,
+        from: mailOptions.from || `"Eventora" <${emailUser}>`
+    });
+};
+
+const verifyEmailConfig = async () => {
+    if (!emailUser || !emailPassword) {
+        throw new Error('EMAIL_USER and EMAIL_PASS are required');
+    }
+
+    await transporter.verify();
+    return {
+        user: emailUser,
+        host: transporter.options.host,
+        port: transporter.options.port
+    };
 };
 
 const sendBookingEmail = async (userEmail, userName, eventTitle) => {
     try {
         const mailOptions = {
-            from: process.env.EMAIL_USER,
             to: userEmail,
             subject: `Booking Confirmed: ${eventTitle}`,
             html: `
@@ -50,7 +69,6 @@ const sendOTPEmail = async (userEmail, otp, type) => {
             : 'Please use the following OTP to verify and confirm your event booking.';
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,
             to: userEmail,
             subject: title,
             html: `
@@ -72,4 +90,4 @@ const sendOTPEmail = async (userEmail, otp, type) => {
     }
 };
 
-module.exports = { sendBookingEmail, sendOTPEmail };
+module.exports = { sendBookingEmail, sendOTPEmail, verifyEmailConfig };
