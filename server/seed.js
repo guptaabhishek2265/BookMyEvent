@@ -8,8 +8,12 @@ const Booking = require('./models/Booking');
 dotenv.config();
 
 const adminEmail = process.env.ADMIN_EMAIL || 'adminn@eventora.com';
-const adminPassword = process.env.ADMIN_PASSWORD || 'Abhishek123';
+const adminPassword = process.env.ADMIN_PASSWORD;
 const adminName = process.env.ADMIN_NAME || 'Admin User';
+
+if (!adminPassword) {
+    throw new Error('ADMIN_PASSWORD is required to seed the admin user.');
+}
 
 const users = [
     { name: adminName, email: adminEmail, password: adminPassword, role: 'admin' },
@@ -166,7 +170,7 @@ const seedDatabase = async () => {
         console.log('-------------------------------------------');
         console.log(`Admin Email: ${adminEmail}`);
         console.log('User Email:  user@eventora.com');
-        console.log(`Admin Password: ${adminPassword}`);
+        console.log('Admin Password: loaded from ADMIN_PASSWORD');
         console.log('Demo user password: password123');
         console.log('-------------------------------------------\n');
 
