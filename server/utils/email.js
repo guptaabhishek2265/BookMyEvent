@@ -15,7 +15,8 @@ const getEnv = (...keys) => {
 const emailUser = cleanEnv(process.env.EMAIL_USER);
 const emailPassword = cleanEnv(process.env.EMAIL_PASS).replace(/\s/g, '');
 const smtpHost = getEnv('SMTP_HOST', 'EMAIL_HOST') || 'smtp.gmail.com';
-const smtpPort = Number(getEnv('SMTP_PORT', 'EMAIL_PORT') || 587);
+const parsedSmtpPort = Number(getEnv('SMTP_PORT', 'EMAIL_PORT') || 587);
+const smtpPort = Number.isInteger(parsedSmtpPort) ? parsedSmtpPort : 587;
 const smtpSecureEnv = getEnv('SMTP_SECURE', 'EMAIL_SECURE');
 const smtpSecure = smtpSecureEnv ? smtpSecureEnv === 'true' : smtpPort === 465;
 
@@ -23,9 +24,9 @@ const primaryOptions = {
     host: smtpHost,
     port: smtpPort,
     secure: smtpSecure,
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
+    connectionTimeout: 12000,
+    greetingTimeout: 12000,
+    socketTimeout: 12000,
     auth: {
         user: emailUser,
         pass: emailPassword
