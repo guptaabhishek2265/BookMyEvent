@@ -2,8 +2,48 @@
 
 A production-ready MERN stack event booking application built as part of a **Full Stack Developer Internship Assessment**. The system allows users to register, log in, browse events, book seats, track booking history, and cancel bookings while keeping event seat availability consistent.
 
+## Screenshots
+
+Add project screenshots in this same sequence:
+
+### 1. User Dashboard
+
+<!-- Add User Dashboard screenshot here -->
+![User Dashboard](./screenshots/user-dashboard.jpeg)
+
+### 2. Event Dashboard
+
+<!-- Add Event Dashboard screenshot here -->
+![Event Dashboard](./screenshots/Event_dashboard.jpeg)
+
+### 3. Event Details and Seat Booking
+
+<!-- Add Event Details / Seat Booking screenshot here -->
+![Event Details and Seat Booking](./screenshots/Otp_filling.jpeg)
+
+### 4. Payment Dashboard
+
+<!-- Add Payment Dashboard screenshot here -->
+![Payment Dashboard](./screenshots/payment-dashboard.jpeg)
+
+### 5. Admin Dashboard
+
+<!-- Add Admin Dashboard screenshot here -->
+![Admin Dashboard](./screenshots/Admin_dashboard.jpeg)
+
+### 6. Booking Approval Status
+
+<!-- Add User Booking Status screenshot after admin approval here -->
+![Booking Approval Status](./screenshots/Payment_dashboard1.jpeg)
+
+### 7. Booking Cancellation
+
+<!-- Add Booking Cancellation screenshot here -->
+![Booking Cancellation](./screenshots/booking-cancellation.jpeg)
+
 ## Table of Contents
 
+- [Screenshots](#screenshots)
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
@@ -18,7 +58,6 @@ A production-ready MERN stack event booking application built as part of a **Ful
 - [Design Decisions](#design-decisions)
 - [Security Considerations](#security-considerations)
 - [Deployment](#deployment)
-- [Screenshots](#screenshots)
 - [Future Enhancements](#future-enhancements)
 
 ## Overview
@@ -825,45 +864,6 @@ https://your-frontend-domain.com
 ```
 
 No trailing slash is required.
-
-## Screenshots
-
-Add project screenshots in this same sequence:
-
-### 1. User Dashboard
-
-<!-- Add User Dashboard screenshot here -->
-![User Dashboard](./screenshots/user-dashboard.jpeg)
-
-### 2. Event Dashboard
-
-<!-- Add Event Dashboard screenshot here -->
-![Event Dashboard](./screenshots/Event_dashboard.jpeg)
-
-### 3. Event Details and Seat Booking
-
-<!-- Add Event Details / Seat Booking screenshot here -->
-![Event Details and Seat Booking](./screenshots/Otp_filling.jpeg)
-
-### 4. Payment Dashboard
-
-<!-- Add Payment Dashboard screenshot here -->
-![Payment Dashboard](./screenshots/payment-dashboard.jpeg)
-
-### 5. Admin Dashboard
-
-<!-- Add Admin Dashboard screenshot here -->
-![Admin Dashboard](./screenshots/Admin_dashboard.jpeg)
-
-### 6. Booking Approval Status
-
-<!-- Add User Booking Status screenshot after admin approval here -->
-![Booking Approval Status](./screenshots/Payment_dashboard1.jpeg)
-
-### 7. Booking Cancellation
-
-<!-- Add Booking Cancellation screenshot here -->
-![Booking Cancellation](./screenshots/booking-cancellation.jpeg)
 
 ## Project Diagrams
 

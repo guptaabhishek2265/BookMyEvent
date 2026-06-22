@@ -103,10 +103,16 @@ const UserDashboard = () => {
         }
     };
 
-    const cancelBooking = async (id) => {
-        if (window.confirm('Are you sure you want to cancel this booking request?')) {
+    const cancelBooking = async (booking) => {
+        const seatText = `${booking.seatsBooked || 1} seat${(booking.seatsBooked || 1) === 1 ? '' : 's'}`;
+        const eventTitle = booking.eventId?.title || 'this booking';
+        const message = booking.status === 'confirmed'
+            ? `Cancel ${seatText} for ${eventTitle}? These seats will be released back to the event.`
+            : `Cancel your booking request for ${eventTitle}?`;
+
+        if (window.confirm(message)) {
             try {
-                await api.delete(`/bookings/${id}`);
+                await api.delete(`/bookings/${booking._id}`);
                 fetchBookings();
             } catch (error) {
                 alert(error.response?.data?.message || 'Error cancelling booking');
@@ -601,9 +607,9 @@ const BookingActions = ({ booking, cancelBooking, compact = false }) => {
             >
                 View
             </Link>
-            {booking.status === 'pending' && (
+            {['pending', 'confirmed'].includes(booking.status) && (
                 <button
-                    onClick={() => cancelBooking(booking._id)}
+                    onClick={() => cancelBooking(booking)}
                     className="rounded-full bg-rose-50 px-4 py-2 text-xs font-black text-rose-600 ring-1 ring-rose-100 transition hover:-translate-y-0.5 hover:bg-rose-600 hover:text-white"
                 >
                     Cancel
