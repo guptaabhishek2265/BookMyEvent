@@ -4,41 +4,48 @@ A production-ready MERN stack event booking application built as part of a **Ful
 
 ## Screenshots
 
-Add project screenshots in this same sequence:
+The screenshots below show the complete booking journey, starting from the user dashboard and ending with booking cancellation.
 
 ### 1. User Dashboard
 
-<!-- Add User Dashboard screenshot here -->
+The user dashboard gives users a quick view of their bookings, payment status, confirmed requests, pending approvals, and cancelled bookings.
+
 ![User Dashboard](./screenshots/user-dashboard.jpeg)
 
 ### 2. Event Dashboard
 
-<!-- Add Event Dashboard screenshot here -->
+The event dashboard displays all available events with search, categories, event cards, prices, and seat availability.
+
 ![Event Dashboard](./screenshots/Event_dashboard.jpeg)
 
 ### 3. Event Details and Seat Booking
 
-<!-- Add Event Details / Seat Booking screenshot here -->
+The event details page lets users review event information, choose the number of seats, request an OTP, and submit the booking request securely.
+
 ![Event Details and Seat Booking](./screenshots/Otp_filling.jpeg)
 
 ### 4. Payment Dashboard
 
-<!-- Add Payment Dashboard screenshot here -->
+The payment dashboard shows the selected event, selected seat count, total amount, and simulated secure payment form.
+
 ![Payment Dashboard](./screenshots/payment-dashboard.jpeg)
 
 ### 5. Admin Dashboard
 
-<!-- Add Admin Dashboard screenshot here -->
+The admin dashboard helps the admin monitor revenue, booking requests, paid clients, confirmed bookings, and event inventory.
+
 ![Admin Dashboard](./screenshots/Admin_dashboard.jpeg)
 
 ### 6. Booking Approval Status
 
-<!-- Add User Booking Status screenshot after admin approval here -->
+After payment, the booking moves into the approval queue until the admin confirms the request.
+
 ![Booking Approval Status](./screenshots/Payment_dashboard1.jpeg)
 
 ### 7. Booking Cancellation
 
-<!-- Add Booking Cancellation screenshot here -->
+Users can cancel pending or confirmed bookings from their dashboard, and confirmed cancellations restore the booked seats to the event.
+
 ![Booking Cancellation](./screenshots/booking-cancellation.jpeg)
 
 ## Table of Contents
