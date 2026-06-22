@@ -50,8 +50,10 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/eventora')
   .catch(err => console.error('MongoDB Connection Error:', err));
 
 const PORT = process.env.PORT || 5000;
-if (process.env.NODE_ENV !== 'production') {
-  const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const HOST = process.env.HOST || '0.0.0.0';
+
+if (require.main === module) {
+  const server = app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`));
 
   server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
