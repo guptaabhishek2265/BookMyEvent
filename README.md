@@ -711,17 +711,28 @@ VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
 
 ### Backend Deployment on Render or Railway
 
-1. Deploy the `server` directory.
-2. Set start command:
+1. Create a new Web Service from this repository.
+2. For a backend-only deploy, set the root directory to:
+
+```text
+server
+```
+
+3. Set the build command:
+
+```bash
+npm install --legacy-peer-deps
+```
+
+4. Set the start command:
 
 ```bash
 npm start
 ```
 
-3. Add backend environment variables:
+5. Add backend environment variables. Render provides `PORT` automatically, so you do not need to set it manually:
 
 ```env
-PORT=5000
 MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=generate_a_secure_random_jwt_secret
 CLIENT_URL=https://your-frontend-domain.com
