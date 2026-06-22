@@ -4,16 +4,27 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const cleanEnv = (value) => (value || '').trim().replace(/^['"]|['"]$/g, '');
+const getEnv = (...keys) => {
+    for (const key of keys) {
+        const value = cleanEnv(process.env[key]);
+        if (value) return value;
+    }
+    return '';
+};
+
 const emailUser = cleanEnv(process.env.EMAIL_USER);
 const emailPassword = cleanEnv(process.env.EMAIL_PASS).replace(/\s/g, '');
+const smtpHost = getEnv('SMTP_HOST', 'EMAIL_HOST') || 'smtp.gmail.com';
+const smtpPort = Number(getEnv('SMTP_PORT', 'EMAIL_PORT') || 587);
+const smtpSecure = (getEnv('SMTP_SECURE', 'EMAIL_SECURE') || 'false') === 'true';
 
 const primaryOptions = {
-    host: cleanEnv(process.env.EMAIL_HOST) || 'smtp.gmail.com',
-    port: Number(process.env.EMAIL_PORT || 587),
-    secure: String(process.env.EMAIL_SECURE || 'false') === 'true',
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpSecure,
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
     auth: {
         user: emailUser,
         pass: emailPassword

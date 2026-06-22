@@ -576,9 +576,9 @@ CLIENT_URL=http://localhost:5173
 GOOGLE_CLIENT_ID=your_google_oauth_client_id
 EMAIL_USER=your_email_address
 EMAIL_PASS=your_email_app_password
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_SECURE=false
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
 ```
 
 | Variable | Description |
@@ -590,9 +590,9 @@ EMAIL_SECURE=false
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID used to verify Google sign-in tokens. |
 | `EMAIL_USER` | Email account used for OTP and booking notifications. |
 | `EMAIL_PASS` | Email app password or SMTP password. |
-| `EMAIL_HOST` | SMTP host. Defaults to `smtp.gmail.com`. |
-| `EMAIL_PORT` | SMTP port. Defaults to `587`. |
-| `EMAIL_SECURE` | Whether SMTP uses implicit TLS. Defaults to `false` for STARTTLS on port `587`. |
+| `SMTP_HOST` | SMTP host. Optional for Gmail because it defaults to `smtp.gmail.com`. |
+| `SMTP_PORT` | SMTP port. Optional for Gmail because it defaults to `587`. |
+| `SMTP_SECURE` | Whether SMTP uses implicit TLS. Optional for Gmail because it defaults to `false` for STARTTLS on port `587`. |
 
 For multiple deployed frontend URLs, use:
 
@@ -745,9 +745,9 @@ CLIENT_URL=https://your-frontend-domain.com
 GOOGLE_CLIENT_ID=your_google_oauth_client_id
 EMAIL_USER=your_email_address
 EMAIL_PASS=your_email_app_password
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_SECURE=false
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
 ```
 
 ### MongoDB Atlas
