@@ -48,9 +48,20 @@ Users can cancel pending or confirmed bookings from their dashboard, and confirm
 
 ![Booking Cancellation](./screenshots/booking-cancellation.jpeg)
 
+## Project Diagrams
+
+### Booking Data Flow
+
+![Booking data flow](./dfd.png)
+
+### Booking Flowchart
+
+![Booking flowchart](./fc.png)
+
 ## Table of Contents
 
 - [Screenshots](#screenshots)
+- [Project Diagrams](#project-diagrams)
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
@@ -871,16 +882,6 @@ https://your-frontend-domain.com
 ```
 
 No trailing slash is required.
-
-## Project Diagrams
-
-### Booking Data Flow
-
-![Booking data flow](./dfd.png)
-
-### Booking Flowchart
-
-![Booking flowchart](./fc.png)
 
 ## Future Enhancements
 
