@@ -7,10 +7,10 @@ const cleanEnv = (value) => (value || '').trim().replace(/^['"]|['"]$/g, '');
 const emailUser = cleanEnv(process.env.EMAIL_USER);
 const emailPassword = cleanEnv(process.env.EMAIL_PASS).replace(/\s/g, '');
 
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: Number(process.env.EMAIL_PORT || 465),
-    secure: String(process.env.EMAIL_SECURE || 'true') === 'true',
+const primaryOptions = {
+    host: cleanEnv(process.env.EMAIL_HOST) || 'smtp.gmail.com',
+    port: Number(process.env.EMAIL_PORT || 587),
+    secure: String(process.env.EMAIL_SECURE || 'false') === 'true',
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 15000,
@@ -18,16 +18,40 @@ const transporter = nodemailer.createTransport({
         user: emailUser,
         pass: emailPassword
     }
-});
+};
+
+const fallbackOptions = {
+    ...primaryOptions,
+    port: 587,
+    secure: false,
+    requireTLS: true
+};
+
+const createTransporter = (options) => nodemailer.createTransport(options);
+
+const shouldRetryWithStartTls = (error, options) => (
+    options.host === 'smtp.gmail.com'
+    && Number(options.port) === 465
+    && ['ETIMEDOUT', 'ECONNECTION', 'ESOCKET'].includes(error.code)
+);
 
 const sendMail = async (mailOptions) => {
     if (!emailUser || !emailPassword) {
         throw new Error('Email service is not configured');
     }
-    return transporter.sendMail({
+
+    const message = {
         ...mailOptions,
         from: mailOptions.from || `"Eventora" <${emailUser}>`
-    });
+    };
+
+    try {
+        return await createTransporter(primaryOptions).sendMail(message);
+    } catch (error) {
+        if (!shouldRetryWithStartTls(error, primaryOptions)) throw error;
+        console.warn('Gmail SMTP 465 failed; retrying with port 587 STARTTLS');
+        return createTransporter(fallbackOptions).sendMail(message);
+    }
 };
 
 const verifyEmailConfig = async () => {
@@ -35,11 +59,41 @@ const verifyEmailConfig = async () => {
         throw new Error('EMAIL_USER and EMAIL_PASS are required');
     }
 
-    await transporter.verify();
+    try {
+        await createTransporter(primaryOptions).verify();
+        return {
+            user: emailUser,
+            host: primaryOptions.host,
+            port: primaryOptions.port,
+            secure: primaryOptions.secure
+        };
+    } catch (error) {
+        if (!shouldRetryWithStartTls(error, primaryOptions)) throw error;
+        console.warn('Gmail SMTP 465 health check failed; retrying with port 587 STARTTLS');
+        await createTransporter(fallbackOptions).verify();
+        return {
+            user: emailUser,
+            host: fallbackOptions.host,
+            port: fallbackOptions.port,
+            secure: fallbackOptions.secure,
+            fallback: true
+        };
+    }
+};
+
+const getEmailConfigSummary = () => ({
+    configured: Boolean(emailUser && emailPassword),
+    user: emailUser,
+    host: primaryOptions.host,
+    port: primaryOptions.port,
+    secure: primaryOptions.secure
+});
+
+const getVerifiedEmailConfig = async () => {
+    const result = await verifyEmailConfig();
     return {
-        user: emailUser,
-        host: transporter.options.host,
-        port: transporter.options.port
+        ...result,
+        configured: true
     };
 };
 
@@ -90,4 +144,4 @@ const sendOTPEmail = async (userEmail, otp, type) => {
     }
 };
 
-module.exports = { sendBookingEmail, sendOTPEmail, verifyEmailConfig };
+module.exports = { getEmailConfigSummary, sendBookingEmail, sendOTPEmail, verifyEmailConfig: getVerifiedEmailConfig };

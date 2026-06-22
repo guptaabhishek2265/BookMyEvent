@@ -48,6 +48,8 @@ app.get('/api/health/email', async (req, res) => {
       message: 'Email configuration is valid',
       host: result.host,
       port: result.port,
+      secure: result.secure,
+      fallback: Boolean(result.fallback),
       user: result.user
     });
   } catch (error) {
