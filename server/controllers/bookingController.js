@@ -23,11 +23,16 @@ exports.sendBookingOTP = async (req, res) => {
             message: error.message,
             code: error.code,
             command: error.command,
-            response: error.response
+            response: error.response,
+            attempts: error.emailAttempts,
+            config: error.emailConfig
         });
         res.status(502).json({
             message: 'Could not send OTP email. Please check the email configuration and try again.',
-            error: process.env.NODE_ENV === 'production' ? undefined : error.message
+            error: error.message,
+            code: error.code,
+            attempts: error.emailAttempts,
+            config: error.emailConfig
         });
     }
 };

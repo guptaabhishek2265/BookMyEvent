@@ -8,7 +8,7 @@ dotenv.config();
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const bookingRoutes = require('./routes/bookings');
-const { verifyEmailConfig } = require('./utils/email');
+const { getEmailConfigSummary, verifyEmailConfig } = require('./utils/email');
 
 const app = express();
 
@@ -49,21 +49,26 @@ app.get('/api/health/email', async (req, res) => {
       host: result.host,
       port: result.port,
       secure: result.secure,
-      fallback: Boolean(result.fallback),
-      user: result.user
+      user: result.user,
+      attempts: result.attempts,
+      config: result.config
     });
   } catch (error) {
     console.error('Email health check failed:', {
       message: error.message,
       code: error.code,
       command: error.command,
-      response: error.response
+      response: error.response,
+      attempts: error.emailAttempts,
+      config: error.emailConfig || getEmailConfigSummary()
     });
     res.status(500).json({
       ok: false,
       message: 'Email configuration failed',
       error: error.message,
-      code: error.code
+      code: error.code,
+      attempts: error.emailAttempts,
+      config: error.emailConfig || getEmailConfigSummary()
     });
   }
 });
@@ -82,6 +87,8 @@ const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 if (require.main === module) {
+  console.info('Email configuration summary:', getEmailConfigSummary());
+
   const server = app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`));
 
   server.on('error', (error) => {
