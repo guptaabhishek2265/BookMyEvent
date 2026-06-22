@@ -103,43 +103,54 @@ The application includes:
 
 ## Application Flow
 
-The application is designed around a complete event booking journey:
+The application is designed around a complete event booking journey. Follow this sequence when explaining or testing the project:
 
-1. **User opens the Event Dashboard**
-   - The user starts on the Discover / Event Dashboard.
-   - Events are shown with category filters, search, ticket price, seat availability, and event cards.
-   - The user selects an event to inspect details before booking.
+1. **User Dashboard**
+   - The user registers, verifies the account, and logs in.
+   - After login, the user lands on the User Dashboard.
+   - The dashboard shows the user's booking summary, including total bookings, pending requests, confirmed bookings, cancelled bookings, and paid amount.
+   - From here, the user can move to the Event Dashboard to browse available events.
 
-2. **User views event details and starts booking**
+2. **Event Dashboard**
+   - The Event Dashboard displays all available events.
+   - Events can be searched or filtered by category.
+   - Each event card shows important details such as event name, image, date, venue, ticket price, and available seats.
+   - The user selects any event to view full details before booking.
+
+3. **Event Details and Seat Selection**
    - The Event Detail page shows event description, venue, date, ticket price, total seats, and available seats.
-   - The user chooses the number of seats to book.
-   - The system validates that the selected seat count is available.
+   - The user enters the number of seats they want to book.
+   - The system checks that the requested number of seats is available.
    - The user requests an OTP before submitting the booking.
 
-3. **User verifies OTP and creates a booking request**
+4. **Booking OTP Verification**
    - The backend sends an OTP to the logged-in user's email.
    - The user enters the OTP on the event page.
    - After successful OTP verification, a booking is created with `pending` status.
-   - For paid events, the user is redirected to the payment page.
+   - The user is then redirected to the Payment Dashboard.
 
-4. **User completes payment**
+5. **Payment Dashboard**
    - The Payment Dashboard displays the selected event, number of seats, and total amount.
    - The user enters payment details and submits payment.
-   - Payment status is recorded as paid.
+   - After successful payment, the payment status is recorded as `paid`.
    - The booking still waits for admin approval after payment.
 
-5. **Admin reviews the booking request**
+6. **Admin Dashboard**
+   - The admin logs in and opens the Admin Dashboard.
    - The Admin Dashboard shows pending booking requests, paid clients, revenue, confirmed bookings, and event inventory.
-   - The admin can approve the booking as paid or reject the request.
+   - The admin reviews the user's paid booking request.
+   - The admin can approve or reject the booking request.
    - When the admin approves the booking, the booking status becomes `confirmed`.
-   - The confirmed booking deducts the booked seat count from the event inventory.
+   - The confirmed booking deducts the booked seat count from the event's available seats.
 
-6. **User tracks bookings from the User Dashboard**
-   - The User Dashboard shows total requests, confirmed bookings, pending requests, paid spend, and cancelled bookings.
+7. **User Booking Status**
+   - After admin approval, the user can return to the User Dashboard.
    - The user can view each booking's event, status, payment state, seat count, and amount.
-   - Confirmed and pending bookings can be cancelled by the user.
+   - Approved bookings appear as `confirmed`.
+   - Bookings waiting for admin approval appear as `pending`.
 
-7. **User cancels a booking**
+8. **User Cancels Seats**
+   - The user can cancel booked seats from the User Dashboard.
    - If a user cancels a pending booking, the booking is marked as `cancelled`.
    - If a user cancels a confirmed booking, the booking is marked as `cancelled` and the booked seats are released back to the event inventory.
    - The event's available seat count is capped at the total seat count to avoid over-restoration.
@@ -709,7 +720,7 @@ npm run dev
 
 - One booking belongs to one user.
 - A user can have only one active booking per event.
-- Current booking flow represents one seat per booking.
+- A booking can include one or more seats selected by the user.
 - Users cannot book more seats than are available.
 - JWT tokens expire after the configured backend duration.
 - Events are pre-created by an admin or database seed.
@@ -814,6 +825,45 @@ https://your-frontend-domain.com
 ```
 
 No trailing slash is required.
+
+## Screenshots
+
+Add project screenshots in this same sequence:
+
+### 1. User Dashboard
+
+<!-- Add User Dashboard screenshot here -->
+![User Dashboard](./screenshots/user-dashboard.jpeg)
+
+### 2. Event Dashboard
+
+<!-- Add Event Dashboard screenshot here -->
+![Event Dashboard](./screenshots/Event_dashboard.jpeg)
+
+### 3. Event Details and Seat Booking
+
+<!-- Add Event Details / Seat Booking screenshot here -->
+![Event Details and Seat Booking](./screenshots/Otp_filling.jpeg)
+
+### 4. Payment Dashboard
+
+<!-- Add Payment Dashboard screenshot here -->
+![Payment Dashboard](./screenshots/payment-dashboard.jpeg)
+
+### 5. Admin Dashboard
+
+<!-- Add Admin Dashboard screenshot here -->
+![Admin Dashboard](./screenshots/Admin_dashboard.jpeg)
+
+### 6. Booking Approval Status
+
+<!-- Add User Booking Status screenshot after admin approval here -->
+![Booking Approval Status](./screenshots/Payment_dashboard1.jpeg)
+
+### 7. Booking Cancellation
+
+<!-- Add Booking Cancellation screenshot here -->
+![Booking Cancellation](./screenshots/booking-cancellation.jpeg)
 
 ## Project Diagrams
 
